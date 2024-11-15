@@ -1,0 +1,12 @@
+mode: ContinuousDelivery
+branches:
+  master:
+    tag: ''
+  feature:
+    tag: useBranchName
+  major*:
+    increment: Major
+  minor*:
+    increment: Minor
+ignore:
+  sha: []
