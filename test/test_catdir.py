@@ -1,7 +1,7 @@
 import unittest
 import os
 import shutil
-from cat_dir.cat_dir import CatDir
+from catdir.catdir import CatDir
 from unittest.mock import patch
 from io import StringIO
 
@@ -68,20 +68,20 @@ class TestCatDir(unittest.TestCase):
         # Prepare input text for reconstruction
         input_text = """
 ####################################################################################################
-TREE:
+# TREE:
 ####################################################################################################
 test_data/test.txt
 test_data/nested/nested.txt
 ####################################################################################################
 # FILES
 ####################################################################################################
-File: test_data/test.txt
-Type: text
+>> File: test_data/test.txt
+>> Type: text
 ----------------------------------------------------------------------------------------------------
 This is a test file.
 ====================================================================================================
-File: test_data/nested/nested.txt
-Type: text
+>> File: test_data/nested/nested.txt
+>> Type: text
 ----------------------------------------------------------------------------------------------------
 This is a nested file.
 ====================================================================================================
