@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -36,7 +36,7 @@ jobs:
     needs: test
     steps:
       - name: Checkout master branch
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -54,13 +54,14 @@ jobs:
       - name: Display Version
         run: "echo Generated version: ${{ steps.version_step.outputs.FullSemVer }}"
 
-      - name: Create Git Tag
-        # if: github.ref == 'refs/heads/main'
-        run: |
-          VERSION=${{ steps.gitversion.outputs.FullSemVer }}
-          echo "Tagging version: $VERSION"
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git tag $VERSION
-          git push origin $VERSION
+      - name: Create tag
+        uses: actions/github-script@v5
+        with:
+          script: |
+            github.rest.git.createRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: 'refs/tags/${{ steps.version_step.outputs.FullSemVer }}',
+              sha: context.sha
+            })
       
