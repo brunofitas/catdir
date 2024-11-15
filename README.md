@@ -27,7 +27,7 @@ pip install git+https://github.com/brunofitas/catdir.git
 Clone the repository and install manually:
 
 ```bash
-git clone https://github.com/yourusername/catdir.git
+git clone https://github.com/brunofitas/catdir.git
 cd catdir
 pip install .
 ```

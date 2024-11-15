@@ -4,6 +4,7 @@ import argparse
 import sys
 from catdir.catdir import CatDir
 
+
 def main():
     parser = argparse.ArgumentParser(description="Cat over directory, respecting .catignore or reconstruct from input.")
     parser.add_argument("target", nargs='?', default=".", help="Target directory (default: current directory)")
@@ -15,14 +16,14 @@ def main():
     recursive = args.recursive.lower() == "true"
     reconstruct = args.reconstruct
 
-    catdir = CatDir(target=target, recursive=recursive, reconstruct=reconstruct)
+    cat_dir = CatDir(target=target, recursive=recursive, reconstruct=reconstruct)
 
     if reconstruct:
         input_text = sys.stdin.read()
-        catdir.reconstruct_tree(input_text)
+        cat_dir.reconstruct_tree(input_text)
     else:
-        catdir.create_tree()
-        catdir.render_tree()
+        cat_dir.create_tree()
+        cat_dir.render_tree()
 
 
 if __name__ == "__main__":

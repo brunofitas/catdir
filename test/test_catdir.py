@@ -34,29 +34,29 @@ class TestCatDir(unittest.TestCase):
             f.write(content)
 
     def test_load_ignore_patterns(self):
-        catdir = CatDir(target=self.test_dir, recursive=True)
-        self.assertIn("*.ignore", catdir.ignore_patterns)
+        cat_dir = CatDir(target=self.test_dir, recursive=True)
+        self.assertIn("*.ignore", cat_dir.ignore_patterns)
 
     def test_should_ignore(self):
-        catdir = CatDir(target=self.test_dir, recursive=True)
-        self.assertTrue(catdir.should_ignore("file.ignore"))
-        self.assertFalse(catdir.should_ignore("test.txt"))
+        cat_dir = CatDir(target=self.test_dir, recursive=True)
+        self.assertTrue(cat_dir.should_ignore("file.ignore"))
+        self.assertFalse(cat_dir.should_ignore("test.txt"))
 
     def test_create_tree(self):
-        catdir = CatDir(target=self.test_dir, recursive=True)
-        catdir.create_tree()
-        self.assertIn(os.path.join(self.test_dir, "test.txt"), catdir.file_tree)
-        self.assertIn(os.path.join(self.test_dir, "nested/nested.txt"), catdir.file_tree)
-        self.assertNotIn(os.path.join(self.test_dir, "ignore.ignore"), catdir.file_tree)
-        self.assertNotIn(os.path.join(self.test_dir, "nested/ignore.ignore"), catdir.file_tree)
+        cat_dir = CatDir(target=self.test_dir, recursive=True)
+        cat_dir.create_tree()
+        self.assertIn(os.path.join(self.test_dir, "test.txt"), cat_dir.file_tree)
+        self.assertIn(os.path.join(self.test_dir, "nested/nested.txt"), cat_dir.file_tree)
+        self.assertNotIn(os.path.join(self.test_dir, "ignore.ignore"), cat_dir.file_tree)
+        self.assertNotIn(os.path.join(self.test_dir, "nested/ignore.ignore"), cat_dir.file_tree)
 
     def test_render_tree(self):
-        catdir = CatDir(target=self.test_dir, recursive=True)
-        catdir.create_tree()
+        cat_dir = CatDir(target=self.test_dir, recursive=True)
+        cat_dir.create_tree()
 
         # Use patch to safely mock sys.stdout
         with patch("sys.stdout", new_callable=StringIO) as mock_stdout:
-            catdir.render_tree()
+            cat_dir.render_tree()
             output_str = mock_stdout.getvalue()
 
         # Verify that the output contains expected file names
@@ -68,20 +68,20 @@ class TestCatDir(unittest.TestCase):
         # Prepare input text for reconstruction
         input_text = """
 ####################################################################################################
-TREE:
+# TREE:
 ####################################################################################################
 test_data/test.txt
 test_data/nested/nested.txt
 ####################################################################################################
 # FILES
 ####################################################################################################
-File: test_data/test.txt
-Type: text
+>> File: test_data/test.txt
+>> Type: text
 ----------------------------------------------------------------------------------------------------
 This is a test file.
 ====================================================================================================
-File: test_data/nested/nested.txt
-Type: text
+>> File: test_data/nested/nested.txt
+>> Type: text
 ----------------------------------------------------------------------------------------------------
 This is a nested file.
 ====================================================================================================
@@ -92,8 +92,8 @@ This is a nested file.
         os.makedirs(reconstruct_dir, exist_ok=True)
 
         # Initialize CatDir for reconstruction
-        catdir = CatDir(target=reconstruct_dir, recursive=True, reconstruct=True)
-        catdir.reconstruct_tree(input_text)
+        cat_dir = CatDir(target=reconstruct_dir, recursive=True, reconstruct=True)
+        cat_dir.reconstruct_tree(input_text)
 
         # Verify files were reconstructed correctly
         with open(os.path.join(reconstruct_dir, "test_data/test.txt"), "r") as f:
@@ -106,19 +106,19 @@ This is a nested file.
         shutil.rmtree(reconstruct_dir, ignore_errors=True)
 
     def test_end_to_end(self):
-        catdir = CatDir(target=self.test_dir, recursive=True)
-        catdir.create_tree()
+        cat_dir = CatDir(target=self.test_dir, recursive=True)
+        cat_dir.create_tree()
 
         # Capture rendered output using patch
         with patch("sys.stdout", new_callable=StringIO) as mock_stdout:
-            catdir.render_tree()
+            cat_dir.render_tree()
             rendered_output = mock_stdout.getvalue()
 
         # Reconstruct in a new directory
         reconstruct_dir = "end_to_end_data"
         os.makedirs(reconstruct_dir, exist_ok=True)
-        catdir_reconstruct = CatDir(target=reconstruct_dir, recursive=True, reconstruct=True)
-        catdir_reconstruct.reconstruct_tree(rendered_output)
+        cat_dir_reconstruct = CatDir(target=reconstruct_dir, recursive=True, reconstruct=True)
+        cat_dir_reconstruct.reconstruct_tree(rendered_output)
 
         # Check if files were successfully reconstructed
         for file_path in ["test.txt", "nested/nested.txt"]:
