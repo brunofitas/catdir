@@ -43,7 +43,7 @@ jobs:
           useConfigFile: true
 
       - name: Display Version
-        run: echo "Generated version: ${{ steps.gitversion.outputs.fullSemVer }}"
+        run: "echo Generated version: ${{ steps.gitversion.outputs.fullSemVer }}"
 
       - name: Create Git Tag
         if: github.ref == 'refs/heads/master'
