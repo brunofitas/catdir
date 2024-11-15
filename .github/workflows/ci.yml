@@ -34,14 +34,18 @@ jobs:
     needs: test
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Install GitVersion
-        uses: gittools/actions/gitversion/setup@v0.10.2
+        uses: gittools/actions/gitversion/setup@v3.0.0
+        with:
+          versionSpec: '6.x'
 
-      - name: Run GitVersion
+      - name: Determine Version
         id: gitversion
-        run: gitversion /output json /showvariable FullSemVer
+        uses: gittools/actions/gitversion/execute@v3.0.0
 
       - name: Display Version
         run: "echo 'Generated version: ${{ steps.gitversion.outputs.FullSemVer }}'"
