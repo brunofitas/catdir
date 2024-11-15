@@ -27,7 +27,7 @@ jobs:
           pip install twine
 
       - name: Run tests
-        run: python -m unittest discover tests
+        run: python -m unittest discover test
 
   version:
     runs-on: ubuntu-latest
