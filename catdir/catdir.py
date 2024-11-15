@@ -1,21 +1,23 @@
 import os
 import fnmatch
-import re
 
 NUMBER_OF_LINE_CHARS = 100
+
+IGNORE_FILE = ".catignore"
 
 
 class CatDir:
     def __init__(self, target, recursive, reconstruct=False):
+        self.file_tree = {}
         self.target = target
         self.recursive = recursive
         self.reconstruct = reconstruct
         self.ignore_patterns = self.load_ignore_patterns() if not reconstruct else []
         if not reconstruct:
-            self.ignore_patterns.append(".catignore")
+            self.ignore_patterns.append(IGNORE_FILE)
 
     def load_ignore_patterns(self):
-        ignore_file = os.path.join(self.target, ".catignore")
+        ignore_file = os.path.join(self.target, IGNORE_FILE)
         ignore_patterns = []
 
         if os.path.exists(ignore_file):
@@ -23,7 +25,7 @@ class CatDir:
                 with open(ignore_file, "r") as f:
                     ignore_patterns = [line.strip() for line in f if line.strip() and not line.startswith("#")]
             except Exception as e:
-                print(f"Error reading .catignore: {e}")
+                print(f"Error reading {IGNORE_FILE}: {e}")
 
         return ignore_patterns
 
@@ -56,7 +58,7 @@ class CatDir:
     def render_tree(self):
         # Print the list of files first
         print("#" * NUMBER_OF_LINE_CHARS)
-        print("TREE:")
+        print("# TREE:")
         print("#" * NUMBER_OF_LINE_CHARS)
         for file_path in self.file_tree.keys():
             print(file_path)
@@ -66,8 +68,8 @@ class CatDir:
         print("#" * NUMBER_OF_LINE_CHARS)
 
         for file_path, content in self.file_tree.items():
-            print(f"File: {file_path}")
-            print(f"Type:", "text" if self.is_text_file(content) else "binary")
+            print(f">> File: {file_path}")
+            print(f">> Type:", "text" if self.is_text_file(content) else "binary")
             print("-" * NUMBER_OF_LINE_CHARS)
             content = content.decode('utf-8', errors='replace') if self.is_text_file(content) else content
             print(content)
@@ -80,15 +82,15 @@ class CatDir:
         is_text_file = True
 
         for line in lines:
-            if line.startswith("File:"):
+            if line.startswith(">> File:"):
                 # Save the previous file content
                 if file_path and file_content:
                     self.write_file(file_path, file_content, is_text_file)
 
                 # Reset for the new file
-                file_path = line.split("File:")[1].strip()
+                file_path = line.split(">> File:")[1].strip()
                 file_content = []
-            elif line.startswith("Type:"):
+            elif line.startswith(">> Type:"):
                 is_text_file = "text" in line
             elif line.startswith("-" * NUMBER_OF_LINE_CHARS):
                 continue
