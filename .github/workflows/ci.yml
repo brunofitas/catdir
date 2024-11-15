@@ -14,6 +14,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -34,7 +36,7 @@ jobs:
     needs: test
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
@@ -43,18 +45,25 @@ jobs:
         with:
           versionSpec: '6.x'
 
+      - name: Debug GitVersion Path
+        run: which dotnet-gitversion
+
       - name: Determine Version
         id: gitversion
         uses: gittools/actions/gitversion/execute@v3.0.0
+        with:
+          useConfigFile: true
+          working-directory: ${{ github.workspace }}
 
       - name: Display Version
-        run: "echo 'Generated version: ${{ steps.gitversion.outputs.FullSemVer }}'"
+        run: "echo Generated version: ${{ steps.gitversion.outputs.FullSemVer }}"
 
       - name: Create Git Tag
         if: github.ref == 'refs/heads/master'
         run: |
           VERSION=${{ steps.gitversion.outputs.FullSemVer }}
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
+          echo "Tagging version: $VERSION"
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git tag $VERSION
           git push origin $VERSION
