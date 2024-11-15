@@ -5,7 +5,6 @@ from catdir.catdir import CatDir
 from unittest.mock import patch
 from io import StringIO
 
-
 class TestCatDir(unittest.TestCase):
 
     def setUp(self):
