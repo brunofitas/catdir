@@ -22,12 +22,12 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install .
+          pip install -r requirements.txt
           pip install build
           pip install twine
 
       - name: Run tests
-        run: python -m unittest discover test
+        run: python -m unittest discover tests
 
   version:
     runs-on: ubuntu-latest
@@ -36,20 +36,19 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Install GitVersion
-        run: |
-          curl -sSL https://github.com/GitTools/GitVersion/releases/download/5.10.3/gitversion-linux.tar.gz | tar xz
-          sudo mv ./gitversion /usr/local/bin/gitversion
-
-      - name: Generate Version
+      - name: Run GitVersion
         id: gitversion
-        run: gitversion /output json /showvariable FullSemVer
+        uses: gittools/actions/gitversion/execute@v0.10.2
+        with:
+          useConfigFile: true
 
-      - name: Tag and Push Version
+      - name: Display Version
+        run: echo "Generated version: ${{ steps.gitversion.outputs.fullSemVer }}"
+
+      - name: Create Git Tag
         if: github.ref == 'refs/heads/master'
         run: |
-          VERSION=$(gitversion /showvariable FullSemVer)
-          echo "Generated version: $VERSION"
+          VERSION=${{ steps.gitversion.outputs.fullSemVer }}
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git tag $VERSION
