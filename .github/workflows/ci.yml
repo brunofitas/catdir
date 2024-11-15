@@ -36,19 +36,20 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Install GitVersion
+        uses: gittools/actions/gitversion/setup@v0.10.2
+
       - name: Run GitVersion
         id: gitversion
-        uses: gittools/actions/gitversion/execute@v0.10.2
-        with:
-          useConfigFile: true
+        run: gitversion /output json /showvariable FullSemVer
 
       - name: Display Version
-        run: "echo Generated version: ${{ steps.gitversion.outputs.fullSemVer }}"
+        run: "echo 'Generated version: ${{ steps.gitversion.outputs.FullSemVer }}'"
 
       - name: Create Git Tag
         if: github.ref == 'refs/heads/master'
         run: |
-          VERSION=${{ steps.gitversion.outputs.fullSemVer }}
+          VERSION=${{ steps.gitversion.outputs.FullSemVer }}
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git tag $VERSION
