@@ -45,7 +45,6 @@ jobs:
         with:
           versionSpec: '6.x'
 
-
       - name: Determine Version
         id: version_step
         uses: gittools/actions/gitversion/execute@v3.0.0
@@ -55,13 +54,13 @@ jobs:
       - name: Display Version
         run: "echo Generated version: ${{ steps.version_step.outputs.FullSemVer }}"
 
-      # - name: Create Git Tag
-      #   if: github.ref == 'refs/heads/master'
-      #   run: |
-      #     VERSION=${{ steps.gitversion.outputs.FullSemVer }}
-      #     echo "Tagging version: $VERSION"
-      #     git config --global user.name "github-actions[bot]"
-      #     git config --global user.email "github-actions[bot]@users.noreply.github.com"
-      #     git tag $VERSION
-      #     git push origin $VERSION
-      #
+      - name: Create Git Tag
+        # if: github.ref == 'refs/heads/main'
+        run: |
+          VERSION=${{ steps.gitversion.outputs.FullSemVer }}
+          echo "Tagging version: $VERSION"
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git tag $VERSION
+          git push origin $VERSION
+      
