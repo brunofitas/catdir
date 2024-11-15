@@ -19,7 +19,7 @@
 ### Install via `pip`
 
 ```bash
-pip install catdir
+pip install git+https://github.com/brunofitas/catdir.git
 ```
 
 ### Manual Installation
