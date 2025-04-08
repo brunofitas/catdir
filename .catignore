@@ -1,0 +1,14 @@
+
+.idea/
+.git/
+.github/
+*.pyc
+__pychache__/
+venv/
+env/
+catdir.egg-info/
+.gitignore
+build/
+README.md
+GitVersion.yml
+pyproject.toml

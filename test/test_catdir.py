@@ -5,6 +5,7 @@ from catdir.catdir import CatDir
 from unittest.mock import patch
 from io import StringIO
 
+
 class TestCatDir(unittest.TestCase):
 
     def setUp(self):
@@ -44,10 +45,11 @@ class TestCatDir(unittest.TestCase):
     def test_create_tree(self):
         cat_dir = CatDir(target=self.test_dir, recursive=True)
         cat_dir.create_tree()
-        self.assertIn(os.path.join(self.test_dir, "test.txt"), cat_dir.file_tree)
-        self.assertIn(os.path.join(self.test_dir, "nested/nested.txt"), cat_dir.file_tree)
-        self.assertNotIn(os.path.join(self.test_dir, "ignore.ignore"), cat_dir.file_tree)
-        self.assertNotIn(os.path.join(self.test_dir, "nested/ignore.ignore"), cat_dir.file_tree)
+
+        self.assertIn("test.txt", cat_dir.file_tree)
+        self.assertIn("nested/nested.txt", cat_dir.file_tree)
+        self.assertNotIn("ignore.ignore", cat_dir.file_tree)
+        self.assertNotIn("nested/ignore.ignore", cat_dir.file_tree)
 
     def test_render_tree(self):
         cat_dir = CatDir(target=self.test_dir, recursive=True)
@@ -122,7 +124,8 @@ This is a nested file.
         # Check if files were successfully reconstructed
         for file_path in ["test.txt", "nested/nested.txt"]:
             original_file = os.path.join(self.test_dir, file_path)
-            reconstructed_file = os.path.join(reconstruct_dir, "test_data", file_path)
+            reconstructed_file = os.path.join(reconstruct_dir, file_path)
+
             with open(original_file, "r") as original, open(reconstructed_file, "r") as reconstructed:
                 self.assertEqual(original.read(), reconstructed.read())
 

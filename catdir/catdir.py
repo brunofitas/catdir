@@ -1,5 +1,6 @@
 import os
 import fnmatch
+import sys
 
 NUMBER_OF_LINE_CHARS = 100
 
@@ -30,10 +31,38 @@ class CatDir:
         return ignore_patterns
 
     def should_ignore(self, file_path):
+        rel_path = os.path.relpath(file_path, self.target).replace(os.sep, "/")
+        filename = os.path.basename(file_path)
+
         for pattern in self.ignore_patterns:
-            if fnmatch.fnmatch(file_path, pattern) or fnmatch.fnmatch(os.path.basename(file_path), pattern):
+            pattern = pattern.strip()
+            if not pattern:
+                continue
+
+            normalized_pattern = pattern.replace("\\", "/")
+
+            # Directory match (e.g., ".git/")
+            if normalized_pattern.endswith("/"):
+                folder = normalized_pattern.rstrip("/")
+                path_parts = rel_path.split("/")
+
+                # Exclude if the folder is in the *exact* position of the path
+                if folder in path_parts:
+                    folder_index = path_parts.index(folder)
+                    if "/".join(path_parts[:folder_index + 1]) == folder:
+                        return True
+
+            # Extension or filename match
+            if fnmatch.fnmatch(filename, normalized_pattern):
                 return True
+
+            # Full relative path match
+            if fnmatch.fnmatch(rel_path, normalized_pattern):
+                return True
+
         return False
+
+
 
     def create_tree(self):
         self.file_tree = {}
@@ -41,6 +70,9 @@ class CatDir:
         for root, dirs, files in os.walk(self.target):
             if not self.recursive:
                 dirs.clear()
+
+            # remove ignored dirs from the walk
+            dirs[:] = [d for d in dirs if not self.should_ignore(os.path.join(root, d))]
 
             for filename in files:
                 file_path = os.path.join(root, filename)
@@ -51,9 +83,11 @@ class CatDir:
                 try:
                     with open(file_path, 'rb') as f:
                         file_content = f.read()
-                        self.file_tree[file_path] = file_content
+                        rel_path = os.path.relpath(file_path, self.target)
+                        self.file_tree[rel_path] = file_content
                 except Exception as e:
                     print(f"Error reading file {file_path}: {e}")
+
 
     def render_tree(self):
         # Print the list of files first
@@ -103,6 +137,7 @@ class CatDir:
             else:
                 file_content.append(line)
 
+
     def write_file(self, file_path, content, is_text_file):
         abs_path = os.path.join(self.target, file_path)
         os.makedirs(os.path.dirname(abs_path), exist_ok=True)
@@ -124,3 +159,4 @@ class CatDir:
             return True
         except UnicodeDecodeError:
             return False
+
